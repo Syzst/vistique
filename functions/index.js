@@ -1,13 +1,23 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable max-len */
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
 const cors = require("cors");
 
+const {Storage} = require("@google-cloud/storage");
+const multer = require("multer");
+const upload = multer({storage: multer.memoryStorage()}).single("photo");
+
 admin.initializeApp();
 
 const db = admin.firestore();
 const app = express();
+
+const storage = new Storage({
+  projectId: "capstone-project-vistique",
+  keyFilename: "D:\Documents\Naufal Aditya Rohendi\Kuliah\Semester 6\Bangkit 2023\Capstone\capstone-project-vistique-001a4a84a6f5.json", // Path to your service account key file
+});
 
 app.use(cors({origin: true}));
 
@@ -229,6 +239,7 @@ app.use(cors({origin: true}));
       article_title,
       article_description,
       article_photo,
+      article_link,
     } = req.body;
 
     try {
@@ -236,6 +247,7 @@ app.use(cors({origin: true}));
         article_title,
         article_description,
         article_photo,
+        article_link,
       };
       const docRef = await db.collection("articles").add(article);
       res.status(201).send({message: "Article Added!", article_id: docRef.id});
@@ -289,65 +301,43 @@ app.use(cors({origin: true}));
 
 // ------------------------ PREDICTS DATA ------------------------
 {
-  // Create new Predict
-  app.post("/predict", async (req, res) => {
-    const {
-      predict_photo,
-      predict_result,
-    } = req.body;
+// Create new Predict
+  app.post("/predicts", (req, res) => {
+    upload(req, res, (error) => {
+      if (error) {
+        console.error("Error uploading photo:", error);
+        res.status(500).json({error: "Failed to upload photo"});
+      } else {
+        const bucketName = "capstone-project-vistique";
+        const file = req.file;
+        const photoName = file.originalname;
 
-    try {
-      const predict = {
-        predict_photo,
-        predict_result,
-      };
-      const docRef = await db.collection("predicts").add(predict);
-      res.status(201).send({message: "Predict Added!", predict_id: docRef.id});
-    } catch (error) {
-      console.error("Error adding predict:", error);
-      res.status(500).send("Error adding predict");
-    }
-  });
+        try {
+          const bucket = storage.bucket(bucketName);
+          const blob = bucket.file(`predict/${photoName}`);
 
-  // Read all Predict
-  app.get("/predicts", async (req, res) => {
-    const snapshot = await db.collection("predicts").get();
+          const blobStream = blob.createWriteStream({
+            resumable: false,
+            gzip: true,
+          });
 
-    const predicts = [];
-    snapshot.forEach((doc) => {
-      const id = doc.id;
-      const data = doc.data();
+          blobStream.on("error", (error) => {
+            console.error("Error uploading photo:", error);
+            res.status(500).json({error: "Failed to upload photo", detailedError: error});
+          });
 
-      predicts.push({id, ...data});
+          blobStream.on("finish", () => {
+            const photoUrl = `https://storage.googleapis.com/${bucketName}/predict/${photoName}`;
+            res.json({photoUrl});
+          });
+
+          blobStream.end(file.buffer);
+        } catch (error) {
+          console.error("Error uploading photo:", error);
+          res.status(500).json({error: "Failed to upload photo"});
+        }
+      }
     });
-    res.status(200).send(JSON.stringify(predicts));
-  });
-
-  // Read Predict by ID
-  app.get("/predict/:id", async (req, res) => {
-    const snapshot = await db.collection("predicts")
-        .doc(req.params.id).get();
-
-    const predictId = snapshot.id;
-    const predictData = snapshot.data();
-
-    res.status(200).send(JSON.stringify({id: predictId, ...predictData}));
-  });
-
-  // Update Predict by ID
-  app.put("/predict/:id", async (req, res) => {
-    const body = req.body;
-
-    await db.collection("predicts").doc(req.params.id).update(body);
-
-    res.status(200).send("Successfully Updating Predict");
-  });
-
-  // Delete Predict by id
-  app.delete("/predict/:id", async (req, res) => {
-    await admin.firestore().collection("predicts").doc(req.params.id).delete();
-
-    res.status(200).send("Successfully Deleting Predict");
   });
 }
 
