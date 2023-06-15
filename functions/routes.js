@@ -6,7 +6,7 @@ const admin = require("firebase-admin");
 const multer = require("multer");
 const imageUpload = require("./imageUpload.js");
 
-const serviceAccount = require("./serviceAccount/capstone-project-vistique-firebase-adminsdk-3cbcs-39819a3095.json");
+const serviceAccount = require("../../serviceAccount/capstone-project-vistique-firebase-adminsdk-3cbcs-39819a3095.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   ignoreUndefinedProperties: true,
@@ -85,13 +85,18 @@ const upload = multer({storage: multer.memoryStorage()}).single("photo");
 // ------------------------ POPULAR BATIK DATA ------------------------
 {
   // Create new Popular Batik
-  router.post("/pbatik", async (req, res) => {
+  router.post("/pbatik", upload, imageUpload.uploadToGcs("predict"), async (req, res) => {
+    let pbatik_photoUrl = "";
+
+    if (req.file && req.file.cloudStoragePublicUrl) {
+      pbatik_photoUrl = req.file.cloudStoragePublicUrl;
+    }
+
     const {
       pbatik_name,
       pbatik_price,
       pbatik_description,
       pbatik_history,
-      pbatik_photo,
     } = req.body;
 
     try {
@@ -100,7 +105,7 @@ const upload = multer({storage: multer.memoryStorage()}).single("photo");
         pbatik_price,
         pbatik_description,
         pbatik_history,
-        pbatik_photo,
+        pbatik_photoUrl,
       };
       const docRef = await db.collection("pbatiks").add(pbatik);
       res.status(201).send({message: "Popular Batik Added!", pbatik_id: docRef.id});
@@ -300,9 +305,9 @@ const upload = multer({storage: multer.memoryStorage()}).single("photo");
       predict_photoUrl = req.file.cloudStoragePublicUrl;
     }
 
-    const predict = {predict_photoUrl};
-
     try {
+      const predict = {predict_photoUrl};
+
       const docRef = await db.collection("predicts").add(predict);
       res.status(201).send({message: "Predict Added", predict_id: docRef.id});
     } catch (error) {

@@ -7,7 +7,7 @@ const {Storage} = require("@google-cloud/storage");
 const {format} = require("date-fns");
 const path = require("path");
 
-const pathKey = path.resolve("./serviceAccount/capstone-project-vistique-firebase-adminsdk-3cbcs-39819a3095.json");
+const pathKey = path.resolve("../../serviceAccount/capstone-project-vistique-firebase-adminsdk-3cbcs-39819a3095.json");
 
 // TODO: Sesuaikan konfigurasi Storage
 const gcs = new Storage({
