@@ -1,45 +1,36 @@
-/* eslint-disable no-useless-escape */
+/* eslint-disable new-cap */
 /* eslint-disable max-len */
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+
 const express = require("express");
-const cors = require("cors");
-
-const {Storage} = require("@google-cloud/storage");
+const admin = require("firebase-admin");
 const multer = require("multer");
-const upload = multer({storage: multer.memoryStorage()}).single("photo");
+const imageUpload = require("./imageUpload.js");
 
-admin.initializeApp();
-
-const db = admin.firestore();
-const app = express();
-
-const storage = new Storage({
-  projectId: "capstone-project-vistique",
-  keyFilename: "D:\Documents\Naufal Aditya Rohendi\Kuliah\Semester 6\Bangkit 2023\Capstone\capstone-project-vistique-001a4a84a6f5.json", // Path to your service account key file
+const serviceAccount = require("./serviceAccount/capstone-project-vistique-firebase-adminsdk-3cbcs-39819a3095.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  ignoreUndefinedProperties: true,
 });
 
-app.use(cors({origin: true}));
+const router = express.Router();
+const db = admin.firestore();
+const upload = multer({storage: multer.memoryStorage()}).single("photo");
 
 // ------------------------ USER DATA ------------------------
 {
-// Create new User
-  app.post("/user", async (req, res) => {
+  // Create new User
+  router.post("/user", async (req, res) => {
     const {
       user_name,
       user_email,
-      user_password,
-      user_photo,
-      user_language,
+      user_photoUrl,
     } = req.body;
 
     try {
       const user = {
         user_name,
         user_email,
-        user_password,
-        user_photo,
-        user_language,
+        user_photoUrl,
       };
       const docRef = await db.collection("users").add(user);
       res.status(201).send({message: "User Added!", user_id: docRef.id});
@@ -50,7 +41,7 @@ app.use(cors({origin: true}));
   });
 
   // Read all Users
-  app.get("/users", async (req, res) => {
+  router.get("/users", async (req, res) => {
     const snapshot = await db.collection("users").get();
 
     const users = [];
@@ -64,7 +55,7 @@ app.use(cors({origin: true}));
   });
 
   // Read User by ID
-  app.get("/user/:id", async (req, res) => {
+  router.get("/user/:id", async (req, res) => {
     const snapshot = await db.collection("users")
         .doc(req.params.id).get();
 
@@ -75,7 +66,7 @@ app.use(cors({origin: true}));
   });
 
   // Update User by ID
-  app.put("/user/:id", async (req, res) => {
+  router.put("/user/:id", async (req, res) => {
     const body = req.body;
 
     await db.collection("users").doc(req.params.id).update(body);
@@ -84,7 +75,7 @@ app.use(cors({origin: true}));
   });
 
   // Delete User by id
-  app.delete("/user/:id", async (req, res) => {
+  router.delete("/user/:id", async (req, res) => {
     await admin.firestore().collection("users").doc(req.params.id).delete();
 
     res.status(200).send("Successfully Deleting user");
@@ -93,8 +84,8 @@ app.use(cors({origin: true}));
 
 // ------------------------ POPULAR BATIK DATA ------------------------
 {
-// Create new Popular Batik
-  app.post("/pbatik", async (req, res) => {
+  // Create new Popular Batik
+  router.post("/pbatik", async (req, res) => {
     const {
       pbatik_name,
       pbatik_price,
@@ -120,7 +111,7 @@ app.use(cors({origin: true}));
   });
 
   // Read all Popular Batik
-  app.get("/pbatiks", async (req, res) => {
+  router.get("/pbatiks", async (req, res) => {
     const snapshot = await db.collection("pbatiks").get();
 
     const pbatiks = [];
@@ -134,7 +125,7 @@ app.use(cors({origin: true}));
   });
 
   // Read Popular Batik by ID
-  app.get("/pbatik/:id", async (req, res) => {
+  router.get("/pbatik/:id", async (req, res) => {
     const snapshot = await db.collection("pbatiks")
         .doc(req.params.id).get();
 
@@ -145,7 +136,7 @@ app.use(cors({origin: true}));
   });
 
   // Update Popular Batik by ID
-  app.put("/pbatik/:id", async (req, res) => {
+  router.put("/pbatik/:id", async (req, res) => {
     const body = req.body;
 
     await db.collection("pbatiks").doc(req.params.id).update(body);
@@ -154,7 +145,7 @@ app.use(cors({origin: true}));
   });
 
   // Delete Popular Batik by id
-  app.delete("/pbatik/:id", async (req, res) => {
+  router.delete("/pbatik/:id", async (req, res) => {
     await admin.firestore().collection("pbatiks").doc(req.params.id).delete();
 
     res.status(200).send("Successfully Deleting Popular Batik");
@@ -163,8 +154,8 @@ app.use(cors({origin: true}));
 
 // ------------------------ BATIK DATA ------------------------
 {
-// Create new Batik
-  app.post("/batik", async (req, res) => {
+  // Create new Batik
+  router.post("/batik", async (req, res) => {
     const {
       batik_name,
       batik_price,
@@ -190,7 +181,7 @@ app.use(cors({origin: true}));
   });
 
   // Read all Batik
-  app.get("/batiks", async (req, res) => {
+  router.get("/batiks", async (req, res) => {
     const snapshot = await db.collection("batiks").get();
 
     const batiks = [];
@@ -204,7 +195,7 @@ app.use(cors({origin: true}));
   });
 
   // Read Batik by ID
-  app.get("/batik/:id", async (req, res) => {
+  router.get("/batik/:id", async (req, res) => {
     const snapshot = await db.collection("batiks")
         .doc(req.params.id).get();
 
@@ -215,7 +206,7 @@ app.use(cors({origin: true}));
   });
 
   // Update Batik by ID
-  app.put("/batik/:id", async (req, res) => {
+  router.put("/batik/:id", async (req, res) => {
     const body = req.body;
 
     await db.collection("batiks").doc(req.params.id).update(body);
@@ -224,7 +215,7 @@ app.use(cors({origin: true}));
   });
 
   // Delete Batik by id
-  app.delete("/batik/:id", async (req, res) => {
+  router.delete("/batik/:id", async (req, res) => {
     await admin.firestore().collection("batiks").doc(req.params.id).delete();
 
     res.status(200).send("Successfully Deleting Batik");
@@ -233,8 +224,8 @@ app.use(cors({origin: true}));
 
 // ------------------------ ARTICLES DATA ------------------------
 {
-// Create new Article
-  app.post("/article", async (req, res) => {
+  // Create new Article
+  router.post("/article", async (req, res) => {
     const {
       article_title,
       article_description,
@@ -258,7 +249,7 @@ app.use(cors({origin: true}));
   });
 
   // Read all Article
-  app.get("/articles", async (req, res) => {
+  router.get("/articles", async (req, res) => {
     const snapshot = await db.collection("articles").get();
 
     const articles = [];
@@ -272,7 +263,7 @@ app.use(cors({origin: true}));
   });
 
   // Read Article by ID
-  app.get("/article/:id", async (req, res) => {
+  router.get("/article/:id", async (req, res) => {
     const snapshot = await db.collection("articles")
         .doc(req.params.id).get();
 
@@ -283,7 +274,7 @@ app.use(cors({origin: true}));
   });
 
   // Update Article by ID
-  app.put("/article/:id", async (req, res) => {
+  router.put("/article/:id", async (req, res) => {
     const body = req.body;
 
     await db.collection("articles").doc(req.params.id).update(body);
@@ -292,7 +283,7 @@ app.use(cors({origin: true}));
   });
 
   // Delete Article by id
-  app.delete("/article/:id", async (req, res) => {
+  router.delete("/article/:id", async (req, res) => {
     await admin.firestore().collection("articles").doc(req.params.id).delete();
 
     res.status(200).send("Successfully Deleting Article");
@@ -301,46 +292,24 @@ app.use(cors({origin: true}));
 
 // ------------------------ PREDICTS DATA ------------------------
 {
-// Create new Predict
-  app.post("/predicts", (req, res) => {
-    upload(req, res, (error) => {
-      if (error) {
-        console.error("Error uploading photo:", error);
-        res.status(500).json({error: "Failed to upload photo"});
-      } else {
-        const bucketName = "capstone-project-vistique";
-        const file = req.file;
-        const photoName = file.originalname;
+  // Create new Predict
+  router.post("/predicts", upload, imageUpload.uploadToGcs("predict"), async (req, res) => {
+    let predict_photoUrl = "";
 
-        try {
-          const bucket = storage.bucket(bucketName);
-          const blob = bucket.file(`predict/${photoName}`);
+    if (req.file && req.file.cloudStoragePublicUrl) {
+      predict_photoUrl = req.file.cloudStoragePublicUrl;
+    }
 
-          const blobStream = blob.createWriteStream({
-            resumable: false,
-            gzip: true,
-          });
+    const predict = {predict_photoUrl};
 
-          blobStream.on("error", (error) => {
-            console.error("Error uploading photo:", error);
-            res.status(500).json({error: "Failed to upload photo", detailedError: error});
-          });
-
-          blobStream.on("finish", () => {
-            const photoUrl = `https://storage.googleapis.com/${bucketName}/predict/${photoName}`;
-            res.json({photoUrl});
-          });
-
-          blobStream.end(file.buffer);
-        } catch (error) {
-          console.error("Error uploading photo:", error);
-          res.status(500).json({error: "Failed to upload photo"});
-        }
-      }
-    });
+    try {
+      const docRef = await db.collection("predicts").add(predict);
+      res.status(201).send({message: "Predict Added", predict_id: docRef.id});
+    } catch (error) {
+      console.error("Error adding predict:", error);
+      res.status(500).send("Error adding predict");
+    }
   });
 }
 
-exports.vistique = functions
-    .region("asia-southeast2")
-    .https.onRequest(app);
+module.exports = router;
