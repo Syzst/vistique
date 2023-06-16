@@ -1,13 +1,13 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
 
 "use strict";
 const {Storage} = require("@google-cloud/storage");
-// const fs = require("fs");
 const {format} = require("date-fns");
 const path = require("path");
 
-const pathKey = path.resolve("../../serviceAccount/capstone-project-vistique-firebase-adminsdk-3cbcs-39819a3095.json");
+const pathKey = path.resolve("./capstone-project-vistique-9124bd1b7cb6.json");
 
 // TODO: Sesuaikan konfigurasi Storage
 const gcs = new Storage({
@@ -23,14 +23,12 @@ function getPublicUrl(filename) {
   return "https://storage.googleapis.com/" + bucketName + "/" + filename;
 }
 
-const ImgUpload = {};
-
-ImgUpload.uploadToGcs = (foldername) => (req, res, next) => {
+const imageUpload = (foldername) => (req, res, next) => {
   if (!req.file) return next();
 
   const currentDate = new Date();
-  const gcsname = foldername + "/" + format(currentDate, "yyyyMMdd-HHmmss") + "-" + req.file.originalname;
-  const file = bucket.file(gcsname);
+  const gcsname = format(currentDate, "yyyy-MM-dd_HH-mm-ss") + "_" + req.file.originalname;
+  const file = bucket.file(foldername + "/" + gcsname);
 
   const stream = file.createWriteStream({
     metadata: {
@@ -43,13 +41,13 @@ ImgUpload.uploadToGcs = (foldername) => (req, res, next) => {
     next(err);
   });
 
-  stream.on("finish", () => {
+  stream.on("finish", async () => {
     req.file.cloudStorageObject = gcsname;
-    req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
+    req.file.cloudStoragePublicUrl = getPublicUrl(foldername + "/" + gcsname);
     next();
   });
 
   stream.end(req.file.buffer);
 };
 
-module.exports = ImgUpload;
+module.exports = imageUpload;
