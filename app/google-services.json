@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "566135338055",
+    "firebase_url": "https://capstone-project-vistique-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "capstone-project-vistique",
+    "storage_bucket": "capstone-project-vistique.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566135338055:android:ec81609a74f17e9cbdad62",
+        "android_client_info": {
+          "package_name": "com.bangkitcapstone.vistique"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "566135338055-upcrh72scopf8s8ujubm5ed0afr136ab.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEsgQK9Z6FgNu7nU7z57PQEQKl5cLvcv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "566135338055-upcrh72scopf8s8ujubm5ed0afr136ab.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

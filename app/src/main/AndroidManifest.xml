@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature android:name="android.hardware.camera" /> <!-- <uses-feature android:name="android.hardware.camera.ar" /> -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Vistique"
+        tools:targetApi="31">
+        <activity
+            android:name=".ui.screen.article.ArticleActivity"
+            android:exported="false"
+            android:label="@string/title_activity_article"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique"/>
+        <activity
+            android:name=".ui.screen.result.ResultActivity"
+            android:exported="false"
+            android:label="@string/title_activity_result"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+        <activity
+            android:name=".ui.screen.detailshop.DetailShopActivity"
+            android:exported="false"
+            android:label="@string/title_activity_detail_shop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+        <activity
+            android:name=".ui.screen.detailbatik.DetailBatikActivity"
+            android:exported="false"
+            android:label="@string/title_activity_detail_batik"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+        <activity
+            android:name=".ui.screen.favorite.FavoriteActivity"
+            android:exported="false"
+            android:label="@string/title_activity_favorite"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+        <activity
+            android:name=".ui.screen.profile.ProfileActivity"
+            android:exported="false"
+            android:label="@string/title_activity_profile"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+        <activity
+            android:name=".ui.screen.register.RegisterActivity"
+            android:exported="false"
+            android:label="@string/title_activity_register"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+        <activity
+            android:name=".ui.screen.login.LoginActivity"
+            android:exported="false"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+        <activity
+            android:name=".ui.screen.welcome.WelcomeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_welcome"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCDpwBdc5a-cFAjR3z8KwrbiWkmQ9GWJRw" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Vistique">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> <!-- <meta-data -->
+        <!-- android:name="com.google.ar.core" -->
+        <!-- android:value="required" /> -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.bangkitcapstone.vistique.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>
